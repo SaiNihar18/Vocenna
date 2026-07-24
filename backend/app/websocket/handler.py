@@ -16,6 +16,9 @@ from app.websocket.connection_manager import manager
 from app.websocket.auth import get_ws_user
 from app.services.stt import get_stt_service
 from app.services.transcript_service import TranscriptService
+from app.services.rag_service import RAGService
+from app.services.voice_commands import VoiceCommandParser
+
 
 
 router = APIRouter()
@@ -234,6 +237,17 @@ async def websocket_room_endpoint(
                                     start_time=0.0,
                                     end_time=0.0
                                 )
+                                # Index transcript in pgvector RAG memory
+                                try:
+                                    await RAGService.index_transcript(
+                                        db=db,
+                                        room_id=room_uuid,
+                                        transcript_id=db_transcript.id,
+                                        speaker_name=user.full_name or user.email,
+                                        text=transcribed_text
+                                    )
+                                except Exception as e:
+                                    print(f"pgvector indexing error: {e}")
 
                             await manager.broadcast_to_room(
                                 str_room_id,
@@ -247,6 +261,19 @@ async def websocket_room_endpoint(
                                     "timestamp": db_transcript.created_at.isoformat()
                                 }
                             )
+
+                            # Parse spoken voice commands
+                            command_result = VoiceCommandParser.parse_command(transcribed_text)
+                            if command_result.get("is_command"):
+                                await manager.broadcast_to_room(
+                                    str_room_id,
+                                    {
+                                        "event": "voice_command_executed",
+                                        "user_id": str_user_id,
+                                        "command": command_result,
+                                        "timestamp": datetime.now(timezone.utc).isoformat()
+                                    }
+                                )
                     except Exception as e:
                         await manager.send_personal_message(str_room_id, str_user_id, {
                             "event": "error",
