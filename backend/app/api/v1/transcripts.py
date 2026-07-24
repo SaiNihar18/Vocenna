@@ -46,7 +46,7 @@ async def get_transcripts(
 @router.get("/rooms/{room_id}/transcripts/export", summary="Export Room Transcript Report")
 async def export_transcript(
     room_id: uuid.UUID,
-    format: str = Query("txt", regex="^(txt|json)$"),
+    format: str = Query("txt", pattern="^(txt|json)$"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ) -> Any:
