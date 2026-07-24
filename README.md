@@ -83,7 +83,7 @@ vocenna/
 - [x] **Phase 1:** Core Foundation & Auth (DB models, JWT Auth, Room CRUD, Swagger UI).
 - [x] **Phase 2:** WebSocket Real-time Infrastructure (WS endpoints, room controls, text chat).
 - [x] **Phase 3:** Speech Processing Service (faster-whisper STT, transcript persistence).
-- [ ] **Phase 4:** AI Intelligence Layer (LLMService, translation, action items, mood analysis).
-- [ ] **Phase 5:** Conversation Memory & Voice Commands (pgvector RAG & voice command parser).
+- [x] **Phase 4:** AI Intelligence Layer (LLMService, translation, action items, mood analysis).
+- [x] **Phase 5:** Conversation Memory & Voice Commands (pgvector RAG & voice command parser).
 - [ ] **Phase 6:** Docker & Local Deployment Readiness (Makefile, production optimizations).
 - [ ] **Phase 7:** Frontend Integration Preparation (API specs & CORS configuration).
