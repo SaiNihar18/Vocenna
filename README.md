@@ -1,4 +1,4 @@
-# Vocenna - Intelligent Voice Collaboration Platform
+# Vocenna — Intelligent Voice Collaboration Platform
 
 Vocenna is an intelligent voice collaboration platform enabling multilingual teams to join virtual voice rooms with real-time live transcription, translation, AI meeting summaries, RAG conversation memory, voice commands, and emotion analysis.
 
@@ -6,74 +6,61 @@ Vocenna is an intelligent voice collaboration platform enabling multilingual tea
 
 ## 🏗️ Architecture & Technology Stack
 
+```mermaid
+flowchart TD
+    Client[Web Browser / Frontend] -->|REST APIs| FastAPI[FastAPI Backend Application]
+    Client -->|WebSockets| WS[WebSocket Room Gateway]
+    
+    FastAPI --> Auth[JWT & OAuth2 Security]
+    FastAPI --> DB[(PostgreSQL 16 + pgvector)]
+    WS --> ConnectionMgr[Room Connection Manager]
+    
+    WS -->|Audio Chunks| STTService[Abstract STTService Driver]
+    STTService -->|faster-whisper / Cloud API| Transcripts[(Transcripts Store)]
+    
+    Transcripts --> Embeddings[Sentence Embeddings Generator]
+    Embeddings -->|384-dim Vectors| VectorDB[(pgvector Memory)]
+    
+    FastAPI -->|Async Tasks| Celery[Celery Worker]
+    Celery --> Redis[(Redis Cache & Broker)]
+    
+    FastAPI --> LLM[Abstract LLMService Driver]
+    LLM -->|Ollama Llama 3 / Cloud API| Summaries[Summaries, Action Items & RAG]
+```
+
 - **Backend Framework:** Python 3.11+ / FastAPI (Uvicorn)
 - **Database:** PostgreSQL 16 with `pgvector` extension for vector embeddings & RAG
 - **ORM & Migrations:** SQLAlchemy 2.0 (Async) + Alembic
 - **Cache & Real-time State:** Redis 7
 - **Task Queue:** Celery with Redis broker for asynchronous AI processing
-- **Speech AI:** `faster-whisper` (Abstracted behind STTService interface)
-- **NLP / LLM AI:** Ollama / Hugging Face / Cloud API (Abstracted behind LLMService interface)
+- **Speech AI:** `faster-whisper` (Abstracted behind `STTService` interface)
+- **NLP / LLM AI:** Ollama (Llama 3) / Hugging Face / Cloud API (Abstracted behind `LLMService` interface)
 - **Authentication:** JWT (PyJWT) + OAuth2 Password Flow
 - **Containerization:** Docker & Docker Compose (Multi-stage production build)
 
 ---
 
-## 🚀 Quickstart - Phase 0 Setup
+## 🚀 Quickstart
 
-### 1. Repository Initialization
-Initialize Git and commit the initial setup:
-
-```bash
-git init
-git add .
-git commit -m "feat: phase 0 - project structure, docker setup, fastAPI app & health checks"
-git branch -M main
-git remote add origin https://github.com/SaiNihar18/Vocenna.git
-```
-
-### 2. Environment Configuration
-Verify `.env` settings (auto-created from `.env.example`):
+### 1. Environment Setup
+Create local `.env` configuration:
 ```bash
 cp .env.example .env
 ```
 
-### 3. Spin Up Docker Containers
-Run all backend infrastructure (PostgreSQL with pgvector, Redis, FastAPI App, Celery Worker):
-
+### 2. Spin Up Services
+Using Makefile or Docker Compose:
 ```bash
-docker compose up --build
+make build
+make up
 ```
+*Alternatively:* `docker compose up --build -d`
 
-### 4. Health Check Verification
-Verify that all services are operational by checking the health endpoint:
-
+### 3. Verify Health & APIs
 - **Root Health:** [http://localhost:8000/health](http://localhost:8000/health)
 - **Component Health & Diagnostics:** [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health)
 - **Interactive OpenAPI Documentation:** [http://localhost:8000/docs](http://localhost:8000/docs)
-
----
-
-## 📁 Project Structure
-
-```
-vocenna/
-├── backend/
-│   ├── app/
-│   │   ├── api/          # REST endpoints (v1 routes)
-│   │   ├── core/         # config, db (pgvector), redis, celery, security
-│   │   ├── models/       # SQLAlchemy models
-│   │   ├── schemas/      # Pydantic v2 schemas
-│   │   ├── services/     # Abstracted AI/Speech interfaces & implementations
-│   │   ├── websocket/    # WS handlers for audio streaming & chat
-│   │   └── utils/        # Shared helper utilities
-│   ├── alembic/          # DB migration scripts
-│   ├── tests/            # Pytest test suite
-│   ├── Dockerfile        # Production multi-stage build
-│   └── requirements.txt  # Core dependencies
-├── docker-compose.yml    # Postgres (w/ pgvector), Redis, App, Celery worker
-├── README.md
-└── .env.example
-```
+- **Frontend Specification:** See [API_DOCUMENTATION.md](file:///e:/Projects/Vocenna/API_DOCUMENTATION.md)
 
 ---
 
@@ -85,5 +72,5 @@ vocenna/
 - [x] **Phase 3:** Speech Processing Service (faster-whisper STT, transcript persistence).
 - [x] **Phase 4:** AI Intelligence Layer (LLMService, translation, action items, mood analysis).
 - [x] **Phase 5:** Conversation Memory & Voice Commands (pgvector RAG & voice command parser).
-- [ ] **Phase 6:** Docker & Local Deployment Readiness (Makefile, production optimizations).
-- [ ] **Phase 7:** Frontend Integration Preparation (API specs & CORS configuration).
+- [x] **Phase 6:** Docker & Local Deployment Readiness (Makefile, production optimizations).
+- [x] **Phase 7:** Frontend Preparation (API specs & CORS configuration).
