@@ -1,5 +1,6 @@
 import json
 import uuid
+import base64
 from datetime import datetime, timezone
 from typing import Optional
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
@@ -13,6 +14,9 @@ from app.models.participant import RoomParticipant
 from app.models.message import ChatMessage
 from app.websocket.connection_manager import manager
 from app.websocket.auth import get_ws_user
+from app.services.stt import get_stt_service
+from app.services.transcript_service import TranscriptService
+
 
 router = APIRouter()
 
@@ -206,6 +210,48 @@ async def websocket_room_endpoint(
                                 "timestamp": datetime.now(timezone.utc).isoformat()
                             }
                         )
+
+            elif event_type == "audio_chunk":
+                raw_audio_b64 = message_json.get("audio") or message_json.get("data")
+                language = message_json.get("language", user.preferred_language)
+
+                if raw_audio_b64:
+                    try:
+                        audio_bytes = base64.b64decode(raw_audio_b64)
+                        stt_service = get_stt_service()
+                        stt_result = await stt_service.transcribe_bytes(audio_bytes, language=language)
+                        transcribed_text = stt_result.get("text", "").strip()
+
+                        if transcribed_text:
+                            async with AsyncSessionLocal() as db:
+                                db_transcript = await TranscriptService.create_transcript(
+                                    db=db,
+                                    room_id=room_uuid,
+                                    user_id=user.id,
+                                    speaker_name=user.full_name or user.email,
+                                    text=transcribed_text,
+                                    language=stt_result.get("language", language),
+                                    start_time=0.0,
+                                    end_time=0.0
+                                )
+
+                            await manager.broadcast_to_room(
+                                str_room_id,
+                                {
+                                    "event": "transcript_segment",
+                                    "transcript_id": str(db_transcript.id),
+                                    "user_id": str_user_id,
+                                    "speaker_name": user.full_name or user.email,
+                                    "text": transcribed_text,
+                                    "language": db_transcript.language,
+                                    "timestamp": db_transcript.created_at.isoformat()
+                                }
+                            )
+                    except Exception as e:
+                        await manager.send_personal_message(str_room_id, str_user_id, {
+                            "event": "error",
+                            "message": f"Audio transcription error: {str(e)}"
+                        })
 
     except WebSocketDisconnect:
         manager.disconnect(str_room_id, str_user_id)
