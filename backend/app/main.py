@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.db import init_db_pgvector
 from app.api.v1.router import api_router
+from app.websocket.handler import router as websocket_router
+
 
 
 @asynccontextmanager
@@ -39,6 +41,8 @@ if settings.CORS_ORIGINS:
     )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(websocket_router)
+
 
 
 @app.get("/health", tags=["Health"])
