@@ -54,3 +54,7 @@ htmlcov/
 # AI models cache / local files
 .cache/
 models_cache/
+
+# Frontend nested repository
+frontend/
+
