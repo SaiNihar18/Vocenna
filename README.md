@@ -80,7 +80,7 @@ vocenna/
 ## 🔄 Phase Roadmap
 
 - [x] **Phase 0:** Project & Git Setup, Docker Compose, FastAPI foundation, `/health` endpoint.
-- [ ] **Phase 1:** Core Foundation & Auth (DB models, JWT Auth, Room CRUD, Swagger UI).
+- [x] **Phase 1:** Core Foundation & Auth (DB models, JWT Auth, Room CRUD, Swagger UI).
 - [ ] **Phase 2:** WebSocket Real-time Infrastructure (WS endpoints, room controls, text chat).
 - [ ] **Phase 3:** Speech Processing Service (faster-whisper STT, transcript persistence).
 - [ ] **Phase 4:** AI Intelligence Layer (LLMService, translation, action items, mood analysis).
