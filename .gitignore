@@ -58,3 +58,6 @@ models_cache/
 # Frontend nested repository
 frontend/
 
+# Local databases
+*.db
+

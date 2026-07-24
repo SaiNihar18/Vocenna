@@ -33,6 +33,8 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 async def init_db_pgvector():
     """Ensure pgvector extension and database tables exist."""
     async with engine.begin() as conn:
-        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
+        if "sqlite" not in settings.DATABASE_URL:
+            await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
         await conn.run_sync(Base.metadata.create_all)
+
 
