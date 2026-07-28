@@ -1,0 +1,98 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+
+  --color-ink: var(--ink);
+  --color-ink-raised: var(--ink-raised);
+  --color-paper: var(--paper);
+  --color-signal-amber: var(--signal-amber);
+  --color-echo-teal: var(--echo-teal);
+  --color-flag-rose: var(--flag-rose);
+  --color-muted-slate: var(--muted-slate);
+  --color-hairline: var(--hairline);
+
+  --color-background: var(--ink);
+  --color-foreground: var(--paper);
+  --color-card: var(--ink-raised);
+  --color-card-foreground: var(--paper);
+  --color-popover: var(--ink-raised);
+  --color-popover-foreground: var(--paper);
+  --color-primary: var(--signal-amber);
+  --color-primary-foreground: #12161C;
+  --color-secondary: var(--ink-raised);
+  --color-secondary-foreground: var(--paper);
+  --color-muted: var(--ink-raised);
+  --color-muted-foreground: var(--muted-slate);
+  --color-accent: var(--echo-teal);
+  --color-accent-foreground: #12161C;
+  --color-destructive: var(--flag-rose);
+  --color-destructive-foreground: var(--paper);
+  --color-border: var(--hairline);
+  --color-input: var(--hairline);
+  --color-ring: var(--signal-amber);
+}
+
+:root {
+  --ink: #12161C;
+  --ink-raised: #1B212A;
+  --paper: #F4F2ED;
+  --signal-amber: #E8A33D;
+  --echo-teal: #4FB8A6;
+  --flag-rose: #D6567A;
+  --muted-slate: #8C94A0;
+  --hairline: #2A313C;
+  --radius: 12px;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html, body, #root {
+    background-color: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--signal-amber) 40%, transparent);
+    color: var(--paper);
+  }
+}
+
+@utility font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+}
+@utility font-mono-ui {
+  font-family: var(--font-mono);
+}
+
+@keyframes speaker-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--signal-amber) 55%, transparent); }
+  50% { box-shadow: 0 0 0 6px color-mix(in oklab, var(--signal-amber) 0%, transparent); }
+}
+@utility speaking-ring {
+  animation: speaker-pulse 1.4s ease-in-out infinite;
+  outline: 2px solid var(--signal-amber);
+  outline-offset: 2px;
+}
+
+@keyframes waveform-bar {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}

@@ -3,6 +3,7 @@ from app.services.llm.base import BaseLLMService
 from app.services.llm.ollama import OllamaLLMService
 from app.services.llm.cloud_api import CloudOpenAILLMService
 from app.services.llm.huggingface import HuggingFaceLLMService
+from app.services.llm.groq import GroqLLMService
 
 
 def get_llm_service() -> BaseLLMService:
@@ -10,6 +11,8 @@ def get_llm_service() -> BaseLLMService:
     driver_type = settings.LLM_SERVICE_TYPE.lower()
     if driver_type == "cloud_api":
         return CloudOpenAILLMService()
+    elif driver_type == "groq":
+        return GroqLLMService()
     elif driver_type == "huggingface":
         return HuggingFaceLLMService()
     else:

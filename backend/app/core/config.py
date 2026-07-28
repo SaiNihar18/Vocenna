@@ -58,6 +58,8 @@ class Settings(BaseSettings):
 
     OPENAI_API_KEY: str = ""
     HUGGINGFACE_HUB_TOKEN: str = ""
+    GROQ_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",
