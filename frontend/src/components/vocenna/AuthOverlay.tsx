@@ -200,20 +200,6 @@ export function AuthOverlay({
             )}
           </button>
         </form>
-
-        <div className="text-center mt-6">
-          <button
-            type="button"
-            onClick={() => {
-              // Bypass using demo mode
-              setToken("demo-jwt-token");
-              onAuthenticated();
-            }}
-            className="text-xs text-echo-teal/70 hover:text-echo-teal transition hover:underline"
-          >
-            Continue in Preview Mode
-          </button>
-        </div>
       </motion.div>
     </div>
   );

@@ -1,6 +1,12 @@
-// Vocenna API + WS client. REST base + WS endpoint per spec.
-export const API_BASE = "http://localhost:8000/api/v1";
-export const WS_BASE = "ws://localhost:8000/ws/rooms";
+const envApiUrl = import.meta.env.VITE_API_URL;
+
+export const API_BASE = envApiUrl 
+  ? `${envApiUrl.replace(/\/$/, "")}/api/v1` 
+  : "http://localhost:8000/api/v1";
+
+export const WS_BASE = envApiUrl 
+  ? `${envApiUrl.replace(/\/$/, "").replace(/^http/, "ws")}/ws/rooms` 
+  : "ws://localhost:8000/ws/rooms";
 
 const TOKEN_KEY = "vocenna_jwt";
 
