@@ -4,6 +4,15 @@ Vocenna is an intelligent voice collaboration platform enabling multilingual tea
 
 ---
 
+## 🌐 Live Cloud Deployments
+
+- **Frontend Client (Vercel):** [https://vocenna-ecru.vercel.app](https://vocenna-ecru.vercel.app)
+- **Backend API Server (Render):** [https://vocenna.onrender.com](https://vocenna.onrender.com)
+  - **Interactive API Docs:** [https://vocenna.onrender.com/docs](https://vocenna.onrender.com/docs)
+  - **API Health Check:** [https://vocenna.onrender.com/api/v1/health](https://vocenna.onrender.com/api/v1/health)
+
+---
+
 ## 🏗️ Architecture & Technology Stack
 
 ```mermaid
@@ -29,12 +38,12 @@ flowchart TD
 ```
 
 - **Backend Framework:** Python 3.11+ / FastAPI (Uvicorn)
-- **Database:** PostgreSQL 16 with `pgvector` extension for vector embeddings & RAG
+- **Database:** PostgreSQL 16 with `pgvector` extension for vector embeddings & RAG (Supabase in Production)
 - **ORM & Migrations:** SQLAlchemy 2.0 (Async) + Alembic
-- **Cache & Real-time State:** Redis 7
+- **Cache & Real-time State:** Redis 7 (Upstash Serverless Redis in Production)
 - **Task Queue:** Celery with Redis broker for asynchronous AI processing
-- **Speech AI:** `faster-whisper` (Abstracted behind `STTService` interface)
-- **NLP / LLM AI:** Ollama (Llama 3) / Hugging Face / Cloud API (Abstracted behind `LLMService` interface)
+- **Speech AI:** `faster-whisper` / Groq Cloud Whisper API (`whisper-large-v3`) for ultra-low latency transcription
+- **NLP / LLM AI:** Groq API (`llama3-8b-8192`) / Ollama (`llama3`) / Hugging Face / OpenAI (Abstracted behind `LLMService` interface)
 - **Authentication:** JWT (PyJWT) + OAuth2 Password Flow
 - **Containerization:** Docker & Docker Compose (Multi-stage production build)
 
