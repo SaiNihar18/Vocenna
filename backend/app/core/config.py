@@ -36,6 +36,43 @@ class Settings(BaseSettings):
             return [i.strip() for i in v.split(",")]
         return v
 
+    @field_validator("DATABASE_URL", "SYNC_DATABASE_URL", mode="before")
+    @classmethod
+    def convert_database_url(cls, v: str) -> str:
+        if not v:
+            return v
+        # Convert direct Supabase host to pooler host to enable IPv4 compatibility on Render
+        if "@db." in v and ".supabase.co" in v:
+            try:
+                parts = v.split("@")
+                credential_part = parts[0]
+                host_port_db_part = parts[1]
+                
+                host_and_rest = host_port_db_part.split(":")
+                host = host_and_rest[0]
+                
+                project_ref = host.split(".")[1]
+                
+                scheme_and_auth = credential_part.split("://")
+                scheme = scheme_and_auth[0]
+                auth = scheme_and_auth[1]
+                auth_parts = auth.split(":")
+                username = auth_parts[0]
+                password = auth_parts[1]
+                
+                new_username = f"{username}.{project_ref}"
+                new_credential_part = f"{scheme}://{new_username}:{password}"
+                new_host = "aws-0-ap-northeast-1.pooler.supabase.com"
+                
+                rest_of_url = ":".join(host_and_rest[1:])
+                
+                resolved_url = f"{new_credential_part}@{new_host}:{rest_of_url}"
+                print(f"Automatically converted direct Supabase URL to IPv4-compatible pooler URL: {resolved_url.split('@')[-1]}")
+                return resolved_url
+            except Exception as e:
+                print(f"Warning: Failed to convert Supabase direct URL to pooler URL: {e}")
+        return v
+
     # PostgreSQL
     POSTGRES_USER: str = "vocenna"
     POSTGRES_PASSWORD: str = "vocenna_password"
