@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Five vertical rounded bars forming a waveform/sound shape, ascending then descending -->
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="bar-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#F0C96A"/>
+      <stop offset="100%" stop-color="#B8872A"/>
+    </linearGradient>
+  </defs>
+  <!-- Bar 1: short left -->
+  <rect x="8"  y="38" width="12" height="28" rx="6" fill="url(#bar-grad)"/>
+  <!-- Bar 2: medium-tall -->
+  <rect x="26" y="24" width="12" height="54" rx="6" fill="url(#bar-grad)"/>
+  <!-- Bar 3: tallest center -->
+  <rect x="44" y="10" width="12" height="76" rx="6" fill="url(#bar-grad)"/>
+  <!-- Bar 4: medium -->
+  <rect x="62" y="28" width="12" height="46" rx="6" fill="url(#bar-grad)"/>
+  <!-- Bar 5: short right -->
+  <rect x="80" y="40" width="12" height="26" rx="6" fill="url(#bar-grad)"/>
+</svg>

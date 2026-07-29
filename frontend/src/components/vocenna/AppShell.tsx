@@ -54,10 +54,10 @@ export function AppShell({
   return (
     <div className="min-h-screen flex bg-ink text-paper">
       <aside className="w-64 shrink-0 border-r border-hairline flex flex-col bg-ink">
-        <div className="px-6 pt-6 pb-8">
-          <div className="font-display text-3xl text-signal-amber leading-none">Vocenna</div>
-          <div className="mt-1 font-mono-ui text-[10px] tracking-[0.22em] uppercase text-muted-slate">
-            Voice Intelligence
+        <div className="px-5 pt-6 pb-7">
+          <div className="flex items-center gap-2.5">
+            <img src="/vocenna-logo.svg" alt="Vocenna" className="w-7 h-7" />
+            <span className="font-display text-xl text-paper tracking-tight">Vocenna</span>
           </div>
         </div>
 
