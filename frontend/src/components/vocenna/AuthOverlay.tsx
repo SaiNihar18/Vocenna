@@ -13,45 +13,88 @@ import {
 } from "@/lib/icons";
 
 /* ─────────────────────────────────────────────
-   Single calm amber waveform — one smooth curve,
-   3-4 gentle rounded peaks, drawn as an SVG path
+   Animated amber waveform — continuously flowing
+   with a hover glow boost and subtle pulse
    ───────────────────────────────────────────── */
+const WAVE_PATH = "M0,40 C40,40 60,22 100,22 C140,22 160,58 200,58 C240,58 260,26 310,26 C360,26 380,52 420,52 C460,52 480,34 520,34";
+const WAVE_LEN = 1180; // approximate path length for dash animation
+
 function AmberWave() {
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <svg
-      viewBox="0 0 520 80"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full max-w-[480px] h-16"
+    <motion.div
+      className="relative w-full max-w-[480px] h-16 cursor-pointer"
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+      animate={{ scale: hovered ? 1.015 : 1 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
       aria-hidden="true"
     >
-      <defs>
-        <filter id="wave-glow">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      {/* Glow layer – thicker, lower opacity */}
-      <path
-        d="M0,40 C40,40 60,22 100,22 C140,22 160,58 200,58 C240,58 260,26 310,26 C360,26 380,52 420,52 C460,52 480,34 520,34"
-        stroke="#E8A33D"
-        strokeWidth="6"
-        strokeLinecap="round"
-        opacity="0.25"
-        filter="url(#wave-glow)"
-      />
-      {/* Main crisp line */}
-      <path
-        d="M0,40 C40,40 60,22 100,22 C140,22 160,58 200,58 C240,58 260,26 310,26 C360,26 380,52 420,52 C460,52 480,34 520,34"
-        stroke="#E8A33D"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        opacity="0.95"
-      />
-    </svg>
+      <svg
+        viewBox="0 0 520 80"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-full h-full"
+      >
+        <defs>
+          <filter id="wave-glow-filter" x="-10%" y="-40%" width="120%" height="180%">
+            <feGaussianBlur stdDeviation={hovered ? "5" : "3"} result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Glow halo layer — pulses gently */}
+        <motion.path
+          d={WAVE_PATH}
+          stroke="#E8A33D"
+          strokeWidth={hovered ? 10 : 7}
+          strokeLinecap="round"
+          filter="url(#wave-glow-filter)"
+          animate={{ opacity: hovered ? [0.35, 0.55, 0.35] : [0.18, 0.32, 0.18] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        {/* Travelling dash — marching ants effect */}
+        <motion.path
+          d={WAVE_PATH}
+          stroke="#E8A33D"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeDasharray={`${WAVE_LEN * 0.18} ${WAVE_LEN * 0.82}`}
+          animate={{ strokeDashoffset: [WAVE_LEN, 0] }}
+          transition={{ duration: 3.5, repeat: Infinity, ease: "linear" }}
+          opacity={hovered ? 0.55 : 0.3}
+        />
+
+        {/* Main crisp wave line */}
+        <motion.path
+          d={WAVE_PATH}
+          stroke="#E8A33D"
+          strokeWidth={hovered ? 3 : 2.5}
+          strokeLinecap="round"
+          animate={{ opacity: hovered ? 1 : 0.92 }}
+          transition={{ duration: 0.3 }}
+        />
+
+        {/* Hover shimmer dot that travels along the wave */}
+        {hovered && (
+          <motion.circle
+            r="4"
+            fill="#E8A33D"
+            filter="url(#wave-glow-filter)"
+            animate={{
+              cx: [0, 100, 200, 310, 420, 520],
+              cy: [40, 22, 58, 26, 52, 34],
+            }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+          />
+        )}
+      </svg>
+    </motion.div>
   );
 }
 
@@ -110,11 +153,21 @@ function HeroPanel() {
           transition={{ delay: 0.6, duration: 0.5 }}
           className="mt-10 flex flex-col gap-3"
         >
-          {proofPoints.map(({ icon: Icon, label }) => (
-            <div key={label} className="flex items-center gap-2.5">
-              <Icon size={14} className="text-muted-slate shrink-0" />
-              <span className="text-sm text-muted-slate">{label}</span>
-            </div>
+          {proofPoints.map(({ icon: Icon, label }, i) => (
+            <motion.div
+              key={label}
+              className="flex items-center gap-2.5 group cursor-default"
+              whileHover={{ x: 3 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <span
+                className="shrink-0 transition-all duration-300 group-hover:drop-shadow-[0_0_6px_#E8A33D99]"
+                style={{ animationDelay: `${i * 0.9}s` }}
+              >
+                <Icon size={14} className="text-muted-slate group-hover:text-signal-amber transition-colors duration-300" />
+              </span>
+              <span className="text-sm text-muted-slate group-hover:text-paper/80 transition-colors duration-300">{label}</span>
+            </motion.div>
           ))}
         </motion.div>
       </div>

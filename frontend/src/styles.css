@@ -71,6 +71,17 @@
     background: color-mix(in oklab, var(--signal-amber) 40%, transparent);
     color: var(--paper);
   }
+  /* Fix browser autofill hijacking the background color */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 9999px var(--ink-raised) inset !important;
+    box-shadow: 0 0 0 9999px var(--ink-raised) inset !important;
+    -webkit-text-fill-color: var(--paper) !important;
+    caret-color: var(--paper);
+    transition: background-color 99999s ease-in-out 0s;
+  }
 }
 
 @utility font-display {
@@ -107,7 +118,29 @@
   100% { background-position: 200% center; }
 }
 
+/* Smooth wave path offset animation */
+@keyframes wave-travel {
+  0%   { stroke-dashoffset: 1200; }
+  100% { stroke-dashoffset: 0; }
+}
+
+/* Pulsing glow for the wave */
+@keyframes wave-glow-pulse {
+  0%, 100% { opacity: 0.18; filter: blur(4px); }
+  50%       { opacity: 0.38; filter: blur(6px); }
+}
+
+/* Subtle icon glow shimmer */
+@keyframes icon-glow {
+  0%, 100% { filter: drop-shadow(0 0 0px transparent); }
+  50%       { filter: drop-shadow(0 0 5px color-mix(in oklab, var(--signal-amber) 55%, transparent)); }
+}
+
 @utility auth-hero-float {
   animation: auth-hero-float 8s ease-in-out infinite;
+}
+
+@utility icon-glow-amber {
+  animation: icon-glow 3s ease-in-out infinite;
 }
 
