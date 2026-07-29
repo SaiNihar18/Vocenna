@@ -16,7 +16,13 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 43200
     
     # CORS
-    CORS_ORIGINS: Union[List[str], str] = ["http://localhost:3000", "http://localhost:5173", "http://localhost:8000"]
+    CORS_ORIGINS: Union[List[str], str] = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:8000",
+        "https://vocenna-ecru.vercel.app",
+        "https://vocenna.vercel.app"
+    ]
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod

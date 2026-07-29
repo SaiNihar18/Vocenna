@@ -1,12 +1,16 @@
-const envApiUrl = import.meta.env.VITE_API_URL;
+function getApiUrl(): string {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+    return "https://vocenna.onrender.com";
+  }
+  return "http://localhost:8000";
+}
 
-export const API_BASE = envApiUrl 
-  ? `${envApiUrl.replace(/\/$/, "")}/api/v1` 
-  : "http://localhost:8000/api/v1";
-
-export const WS_BASE = envApiUrl 
-  ? `${envApiUrl.replace(/\/$/, "").replace(/^http/, "ws")}/ws/rooms` 
-  : "ws://localhost:8000/ws/rooms";
+const resolvedBaseUrl = getApiUrl().replace(/\/$/, "");
+export const API_BASE = `${resolvedBaseUrl}/api/v1`;
+export const WS_BASE = `${resolvedBaseUrl.replace(/^http/, "ws")}/ws/rooms`;
 
 const TOKEN_KEY = "vocenna_jwt";
 
