@@ -6,10 +6,10 @@ Vocenna is an intelligent voice collaboration platform enabling multilingual tea
 
 ## 🌐 Live Cloud Deployments
 
-- **Frontend Client (Vercel):** [https://vocenna-ecru.vercel.app](https://vocenna-ecru.vercel.app)
+- **Frontend Client (Vercel):** [https://vocenna.vercel.app](https://vocenna.vercel.app)
 - **Backend API Server (Render):** [https://vocenna.onrender.com](https://vocenna.onrender.com)
   - **Interactive API Docs:** [https://vocenna.onrender.com/docs](https://vocenna.onrender.com/docs)
-  - **API Health Check:** [https://vocenna.onrender.com/api/v1/health](https://vocenna.onrender.com/api/v1/health)
+  - **API Health Check:** [https://vocenna.onrender.com/health](https://vocenna.onrender.com/health)
 
 ---
 

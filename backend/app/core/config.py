@@ -36,39 +36,61 @@ class Settings(BaseSettings):
             return [i.strip() for i in v.split(",")]
         return v
 
-    @field_validator("DATABASE_URL", "SYNC_DATABASE_URL", mode="before")
+    @field_validator("DATABASE_URL", mode="before")
     @classmethod
-    def convert_database_url(cls, v: str) -> str:
+    def validate_database_url(cls, v: str) -> str:
         if not v:
             return v
-        # Convert direct Supabase host to pooler host to enable IPv4 compatibility on Render
+        # Enforce scheme postgresql+asyncpg:// for asyncpg driver
+        if v.startswith("postgresql://"):
+            v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return cls._convert_to_pooler(v)
+
+    @field_validator("SYNC_DATABASE_URL", mode="before")
+    @classmethod
+    def validate_sync_database_url(cls, v: str) -> str:
+        if not v:
+            return v
+        # Enforce scheme postgresql:// for sync drivers (psycopg2 used by alembic)
+        if v.startswith("postgresql+asyncpg://"):
+            v = v.replace("postgresql+asyncpg://", "postgresql://", 1)
+        return cls._convert_to_pooler(v)
+
+    @classmethod
+    def _convert_to_pooler(cls, v: str) -> str:
         if "@db." in v and ".supabase.co" in v:
             try:
-                parts = v.split("@")
-                credential_part = parts[0]
-                host_port_db_part = parts[1]
+                scheme, rest = v.split("://", 1)
+                if "/" in rest:
+                    auth_host, path = rest.split("/", 1)
+                    path = "/" + path
+                else:
+                    auth_host = rest
+                    path = ""
                 
-                host_and_rest = host_port_db_part.split(":")
-                host = host_and_rest[0]
+                credentials, host_port = auth_host.split("@", 1)
+                
+                if ":" in credentials:
+                    username, password = credentials.split(":", 1)
+                else:
+                    username = credentials
+                    password = ""
+                
+                if ":" in host_port:
+                    host, port = host_port.split(":", 1)
+                else:
+                    host = host_port
+                    port = "5432"
                 
                 project_ref = host.split(".")[1]
                 
-                scheme_and_auth = credential_part.split("://")
-                scheme = scheme_and_auth[0]
-                auth = scheme_and_auth[1]
-                auth_parts = auth.split(":")
-                username = auth_parts[0]
-                password = auth_parts[1]
+                if not username.endswith(f".{project_ref}"):
+                    username = f"{username}.{project_ref}"
                 
-                new_username = f"{username}.{project_ref}"
-                new_credential_part = f"{scheme}://{new_username}:{password}"
                 new_host = "aws-0-ap-northeast-1.pooler.supabase.com"
-                
-                rest_of_url = ":".join(host_and_rest[1:])
-                
-                resolved_url = f"{new_credential_part}@{new_host}:{rest_of_url}"
-                print(f"Automatically converted direct Supabase URL to IPv4-compatible pooler URL: {resolved_url.split('@')[-1]}")
-                return resolved_url
+                resolved = f"{scheme}://{username}:{password}@{new_host}:{port}{path}"
+                print(f"Mapped database URL to pooler: {resolved.split('@')[-1]}")
+                return resolved
             except Exception as e:
                 print(f"Warning: Failed to convert Supabase direct URL to pooler URL: {e}")
         return v
