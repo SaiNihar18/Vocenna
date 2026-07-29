@@ -109,9 +109,9 @@ export type ChatMessage = {
 
 // ————— Mock fallbacks
 export const currentUser = {
-  id: "u_elena",
-  name: "Elena R.",
-  email: "elena@vocenna.io",
+  id: "u_member",
+  name: "Workspace Member",
+  email: "member@vocenna.app",
   avatar: undefined,
   role: "Host" as Role,
   language: "en",

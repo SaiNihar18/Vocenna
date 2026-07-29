@@ -25,6 +25,9 @@ const NAV: Nav[] = [
   { to: "/team", label: "Team", Icon: Users },
 ];
 
+// Module-level cache to prevent profile flashing when transitioning routes
+let cachedUser: any = null;
+
 export function AppShell({
   title,
   onCreateRoom,
@@ -35,18 +38,27 @@ export function AppShell({
   children: ReactNode;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [user, setUser] = useState(currentUser);
+  const [user, setUser] = useState(cachedUser || currentUser);
 
   useEffect(() => {
     async function fetchUser() {
-      const u = await api.me();
-      setUser(u);
+      try {
+        const u = await api.me();
+        cachedUser = u;
+        setUser(u);
+      } catch (err) {
+        console.error("Failed to load user profile:", err);
+      }
     }
-    fetchUser();
+    // Only fetch if not already cached
+    if (!cachedUser) {
+      fetchUser();
+    }
   }, []);
 
   function handleLogout() {
     setToken("");
+    cachedUser = null;
     window.location.href = "/";
   }
 
