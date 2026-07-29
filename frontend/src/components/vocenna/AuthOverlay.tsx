@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { api, setToken } from "@/lib/vocenna-api";
+import { api, setToken, API_BASE } from "@/lib/vocenna-api";
 import {
   Key,
   Mail,
@@ -178,6 +178,40 @@ export function AuthOverlay({
   const [preferredLanguage, setPreferredLanguage] = useState("en");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isWakingUp, setIsWakingUp] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    const controller = new AbortController();
+
+    async function pingBackend() {
+      // Get the root backend URL from the API base URL (e.g. remove /api/v1)
+      const rootUrl = API_BASE.replace(/\/api\/v1\/?$/, "");
+      try {
+        const res = await fetch(`${rootUrl}/health`, { 
+          signal: controller.signal 
+        });
+        if (res.ok && active) {
+          setIsWakingUp(false);
+        } else if (active) {
+          // If response not ok (e.g. 502/503 during spinup), retry in 2.5s
+          setTimeout(pingBackend, 2500);
+        }
+      } catch (err) {
+        if (active) {
+          // Fetch failed (network error during spinup), retry in 2.5s
+          setTimeout(pingBackend, 2500);
+        }
+      }
+    }
+
+    pingBackend();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -264,6 +298,26 @@ export function AuthOverlay({
               );
             })}
           </div>
+
+          {/* Backend Waking Up Status Alert */}
+          <AnimatePresence>
+            {isWakingUp && (
+              <motion.div
+                initial={{ height: 0, opacity: 0, marginBottom: 0 }}
+                animate={{ height: "auto", opacity: 1, marginBottom: 20 }}
+                exit={{ height: 0, opacity: 0, marginBottom: 0 }}
+                className="bg-signal-amber/10 border border-signal-amber/20 text-signal-amber text-sm rounded-xl p-3 flex items-start gap-3 overflow-hidden"
+              >
+                <div className="w-4 h-4 border-2 border-signal-amber border-t-transparent rounded-full animate-spin shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <span className="font-semibold block text-xs">Waking up Vocenna engine...</span>
+                  <span className="text-xs text-paper/70 block leading-relaxed">
+                    Our voice translation and intelligence platform is initializing. Please wait a moment while the secure server spins up.
+                  </span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Error */}
           <AnimatePresence>

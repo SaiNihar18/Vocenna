@@ -289,7 +289,10 @@ function LiveRoomPage() {
       {/* Minimal topbar */}
       <header className="h-14 border-b border-hairline flex items-center justify-between px-6 bg-ink">
         <div className="flex items-center gap-4">
-          <Link to="/" className="font-display text-xl text-signal-amber">Vocenna</Link>
+          <Link to="/" className="flex items-center gap-2.5">
+            <img src="/vocenna-logo.svg" alt="Vocenna" className="w-6 h-6" />
+            <span className="font-display text-lg text-paper tracking-tight">Vocenna</span>
+          </Link>
           <span className="hidden md:flex items-center gap-2 text-xs">
             <span className="inline-flex items-center gap-1.5 text-signal-amber">
               <span className="w-1.5 h-1.5 rounded-full bg-signal-amber animate-pulse" />
