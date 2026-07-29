@@ -31,14 +31,30 @@ app = FastAPI(
 )
 
 # Set CORS middleware
+origins = []
 if settings.CORS_ORIGINS:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.CORS_ORIGINS],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    if isinstance(settings.CORS_ORIGINS, str):
+        try:
+            import json
+            origins = json.loads(settings.CORS_ORIGINS)
+        except Exception:
+            origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
+    else:
+        origins = [str(o) for o in settings.CORS_ORIGINS]
+
+# Force allow production Vercel origins to guarantee CORS success
+prod_domains = ["https://vocenna-ecru.vercel.app", "https://vocenna.vercel.app"]
+for domain in prod_domains:
+    if domain not in origins:
+        origins.append(domain)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.include_router(websocket_router)
