@@ -8,7 +8,7 @@ import { Users, Globe } from "@/lib/icons";
 export const Route = createFileRoute("/my-rooms")({
   head: () => ({
     meta: [
-      { title: "My Rooms — Vocenna" },
+      { title: "My Rooms | Vocenna" },
     ],
   }),
   component: MyRoomsPage,

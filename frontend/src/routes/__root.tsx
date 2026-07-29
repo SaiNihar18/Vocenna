@@ -80,17 +80,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Vocenna — Voice Intelligence" },
+      { title: "Vocenna" },
       { name: "description", content: "Intelligent voice collaboration with live transcription, translation, sentiment, and searchable meeting memory." },
       { name: "author", content: "Vocenna" },
-      { property: "og:title", content: "Vocenna — Voice Intelligence" },
+      { property: "og:title", content: "Vocenna" },
       { property: "og:description", content: "Intelligent voice collaboration with live transcription, translation, sentiment, and searchable meeting memory." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/vocenna-logo.svg", type: "image/svg+xml" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

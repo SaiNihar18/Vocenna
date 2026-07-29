@@ -7,9 +7,9 @@ import { api } from "@/lib/vocenna-api";
 export const Route = createFileRoute("/memory")({
   head: () => ({
     meta: [
-      { title: "Vocenna — Memory Search" },
+      { title: "Memory Search | Vocenna" },
       { name: "description", content: "Ask questions across every past meeting. RAG-powered synthesis with cited sources." },
-      { property: "og:title", content: "Vocenna — Memory Search" },
+      { property: "og:title", content: "Memory Search | Vocenna" },
       { property: "og:description", content: "Ask questions across every past meeting. RAG-powered synthesis with cited sources." },
     ],
   }),

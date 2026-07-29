@@ -10,9 +10,9 @@ import { api, mockSentiment, mockSummary } from "@/lib/vocenna-api";
 export const Route = createFileRoute("/rooms/$roomId/summary")({
   head: ({ params }) => ({
     meta: [
-      { title: `Vocenna — Meeting Summary` },
+      { title: `Meeting Summary | Vocenna` },
       { name: "description", content: "AI summary, decisions, and action items from your Vocenna voice meeting." },
-      { property: "og:title", content: `Vocenna — Meeting Summary` },
+      { property: "og:title", content: `Meeting Summary | Vocenna` },
       { property: "og:description", content: "AI summary, decisions, and action items from your Vocenna voice meeting." },
       { name: "robots", content: "noindex" },
     ],

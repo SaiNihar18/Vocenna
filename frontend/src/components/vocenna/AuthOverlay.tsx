@@ -188,18 +188,16 @@ export function AuthOverlay({
       // Get the root backend URL from the API base URL (e.g. remove /api/v1)
       const rootUrl = API_BASE.replace(/\/api\/v1\/?$/, "");
       try {
-        const res = await fetch(`${rootUrl}/health`, { 
+        await fetch(`${rootUrl}/health`, { 
+          mode: "no-cors",
           signal: controller.signal 
         });
-        if (res.ok && active) {
+        if (active) {
           setIsWakingUp(false);
-        } else if (active) {
-          // If response not ok (e.g. 502/503 during spinup), retry in 2.5s
-          setTimeout(pingBackend, 2500);
         }
       } catch (err) {
         if (active) {
-          // Fetch failed (network error during spinup), retry in 2.5s
+          // Fetch failed (network error/timeout during spinup), retry in 2.5s
           setTimeout(pingBackend, 2500);
         }
       }

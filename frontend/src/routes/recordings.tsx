@@ -7,7 +7,7 @@ import { Play, Calendar, Clock, Download } from "@/lib/icons";
 export const Route = createFileRoute("/recordings")({
   head: () => ({
     meta: [
-      { title: "Recordings — Vocenna" },
+      { title: "Recordings | Vocenna" },
     ],
   }),
   component: RecordingsPage,

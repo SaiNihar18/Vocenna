@@ -14,9 +14,9 @@ import {
 export const Route = createFileRoute("/rooms/$roomId/")({
   head: ({ params }) => ({
     meta: [
-      { title: `Vocenna — Live Room ${params.roomId}` },
+      { title: `Live Room ${params.roomId} | Vocenna` },
       { name: "description", content: "Live voice room with real-time transcription, translation, and AI-assisted collaboration." },
-      { property: "og:title", content: "Vocenna Live Room" },
+      { property: "og:title", content: `Live Room ${params.roomId} | Vocenna` },
       { property: "og:description", content: "Live voice room with real-time transcription, translation, and AI-assisted collaboration." },
       { name: "robots", content: "noindex" },
     ],

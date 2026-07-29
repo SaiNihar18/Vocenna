@@ -34,9 +34,9 @@ const itemVariants = {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Vocenna — Voice Intelligence Dashboard" },
+      { title: "Dashboard | Vocenna" },
       { name: "description", content: "Join, create, and manage live voice collaboration rooms with AI transcription, translation, and memory." },
-      { property: "og:title", content: "Vocenna — Voice Intelligence Dashboard" },
+      { property: "og:title", content: "Dashboard | Vocenna" },
       { property: "og:description", content: "Join, create, and manage live voice collaboration rooms with AI transcription, translation, and memory." },
     ],
   }),

@@ -9,7 +9,7 @@ import { api } from "@/lib/vocenna-api";
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
-      { title: "Settings — Vocenna" },
+      { title: "Settings | Vocenna" },
     ],
   }),
   component: SettingsPage,

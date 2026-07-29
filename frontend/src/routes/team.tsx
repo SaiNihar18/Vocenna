@@ -32,7 +32,7 @@ const itemVariants = {
 export const Route = createFileRoute("/team")({
   head: () => ({
     meta: [
-      { title: "Team — Vocenna" },
+      { title: "Team | Vocenna" },
     ],
   }),
   component: TeamPage,
