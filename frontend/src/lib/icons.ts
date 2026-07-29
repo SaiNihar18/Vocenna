@@ -36,6 +36,8 @@ export {
   Calendar,
   Play,
   Clock,
+  Brain,
+  FileText,
 } from "lucide-react";
 
 
