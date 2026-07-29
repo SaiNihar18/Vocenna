@@ -49,6 +49,7 @@ function DashboardPage() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [code, setCode] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [passcode, setPasscode] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -68,6 +69,11 @@ function DashboardPage() {
   async function handleJoinRoom() {
     if (!code.trim()) return;
     const cleanCode = code.trim();
+    if (showPass && passcode.trim()) {
+      sessionStorage.setItem(`room_passcode_${cleanCode}`, passcode.trim());
+    } else {
+      sessionStorage.removeItem(`room_passcode_${cleanCode}`);
+    }
     try {
       // Navigate straight to the live room page using the room code/identifier
       navigate({ to: "/rooms/$roomId", params: { roomId: cleanCode } });
@@ -101,6 +107,9 @@ function DashboardPage() {
               </button>
               {showPass && (
                 <input
+                  value={passcode}
+                  onChange={(e) => setPasscode(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleJoinRoom()}
                   placeholder="Passcode"
                   className="mt-2 w-full bg-ink border border-hairline rounded-lg px-3 py-2 font-mono-ui text-sm placeholder:text-muted-slate/70 focus:outline-none focus:border-echo-teal"
                 />

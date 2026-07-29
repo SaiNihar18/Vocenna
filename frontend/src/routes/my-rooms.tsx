@@ -90,7 +90,7 @@ function MyRoomsPage() {
                 <Link
                   to="/rooms/$roomId"
                   params={{ roomId: room.id }}
-                  className="block group rounded-xl border border-hairline bg-ink-raised hover:bg-ink-hover transition p-5 space-y-4"
+                  className="block group rounded-xl border border-hairline bg-ink-raised hover:bg-ink-raised/75 hover:border-echo-teal/60 transition p-5 space-y-4"
                 >
                 <div className="flex items-start justify-between">
                   <div className="bg-echo-teal/10 text-echo-teal font-mono-ui text-[10px] font-bold px-2 py-0.5 rounded tracking-wide uppercase">

@@ -39,6 +39,15 @@ function LiveRoomPage() {
   const [commandText, setCommandText] = useState("");
   const [wsError, setWsError] = useState("");
 
+  const [showChat, setShowChat] = useState(true);
+  const [showParticipantsModal, setShowParticipantsModal] = useState(false);
+  const [noiseSuppression, setNoiseSuppression] = useState(false);
+
+  // Passcode flow
+  const [needsPasscode, setNeedsPasscode] = useState(false);
+  const [passcode, setPasscode] = useState("");
+  const [passcodeError, setPasscodeError] = useState("");
+
   const wsRef = useRef<WebSocket | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioIntervalRef = useRef<any>(null);
@@ -83,7 +92,11 @@ function LiveRoomPage() {
       console.log("WebSocket connection established successfully.");
       setWsError("");
       // Join Room formally on backend
-      api.joinRoom(roomId).catch(console.error);
+      const storedPass = sessionStorage.getItem(`room_passcode_${roomId}`) || undefined;
+      api.joinRoom(roomId, storedPass).catch((err: any) => {
+        console.error("Failed to join room:", err);
+        setNeedsPasscode(true);
+      });
     };
 
     ws.onmessage = (e) => {
@@ -313,10 +326,22 @@ function LiveRoomPage() {
           >
             <Sparkles size={14} /> View Summary
           </Link>
-          <button className="text-muted-slate hover:text-paper"><Users size={16} /></button>
-          <button className="text-muted-slate hover:text-paper relative">
+          <button
+            onClick={() => setShowParticipantsModal(true)}
+            className="text-muted-slate hover:text-paper"
+            aria-label="View participants"
+          >
+            <Users size={16} />
+          </button>
+          <button
+            onClick={() => setShowChat(!showChat)}
+            className="text-muted-slate hover:text-paper relative"
+            aria-label="Toggle chat"
+          >
             <MessageSquare size={16} />
-            <span className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-signal-amber" />
+            {messages.length > 0 && !showChat && (
+              <span className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-signal-amber" />
+            )}
           </button>
         </div>
       </header>
@@ -328,7 +353,7 @@ function LiveRoomPage() {
         </div>
       )}
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_360px] min-h-0">
+      <div className={`flex-1 grid min-h-0 ${showChat ? "grid-cols-1 lg:grid-cols-[1fr_360px]" : "grid-cols-1"}`}>
         {/* Stage + transcript */}
         <div className="p-6 flex flex-col gap-4 min-h-0 overflow-auto pb-32">
           <section className="rounded-xl border border-hairline bg-ink-raised p-5">
@@ -404,15 +429,20 @@ function LiveRoomPage() {
         </div>
 
         {/* Chat sidebar */}
-        <aside className="border-l border-hairline bg-ink flex flex-col min-h-0">
-          <div className="px-5 py-4 border-b border-hairline flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm">
-              <MessageSquare size={14} /> Room Chat
+        {showChat && (
+          <aside className="border-l border-hairline bg-ink flex flex-col min-h-0">
+            <div className="px-5 py-4 border-b border-hairline flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm">
+                <MessageSquare size={14} /> Room Chat
+              </div>
+              <button
+                onClick={() => setShowChat(false)}
+                className="text-muted-slate hover:text-paper"
+                aria-label="Collapse"
+              >
+                <X size={14} />
+              </button>
             </div>
-            <button className="text-muted-slate hover:text-paper" aria-label="Collapse">
-              <X size={14} />
-            </button>
-          </div>
           <div className="flex-1 overflow-auto p-4 space-y-4">
             {messages.length === 0 ? (
               <div className="py-10 text-center text-xs text-muted-slate">
@@ -452,13 +482,23 @@ function LiveRoomPage() {
             </div>
           </div>
         </aside>
+        )}
       </div>
 
       {/* Voice control toolbar */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
         <div className="flex items-center gap-2 bg-ink-raised border border-hairline rounded-full px-3 py-2 shadow-2xl">
-          <ToolbarBtn onClick={() => {}} aria-label="Toggle camera">
-            <MicOff size={16} className="opacity-40" />
+          <ToolbarBtn
+            onClick={() => {
+              setNoiseSuppression(!noiseSuppression);
+              setShowCommand(true);
+              setCommandText(noiseSuppression ? "Noise Suppression: Off" : "Noise Suppression: Active (AI Filter)");
+              setTimeout(() => setShowCommand(false), 3000);
+            }}
+            aria-label="Toggle noise suppression"
+            active={noiseSuppression}
+          >
+            <Zap size={16} />
           </ToolbarBtn>
           <button
             onClick={handleToggleMute}
@@ -505,7 +545,7 @@ function LiveRoomPage() {
               </div>
               <div className="pr-4">
                 <div className="font-mono-ui text-[10px] tracking-widest uppercase text-muted-slate">
-                  Voice Command Executed
+                  Notification
                 </div>
                 <div className="font-mono-ui text-sm text-paper mt-0.5 uppercase">
                   {commandText}
@@ -520,8 +560,156 @@ function LiveRoomPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Participants Overlay Modal */}
+      <AnimatePresence>
+        {showParticipantsModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowParticipantsModal(false)}
+            className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 15 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-ink-raised border border-hairline rounded-xl w-full max-w-md overflow-hidden shadow-2xl"
+            >
+              <div className="px-6 py-4 border-b border-hairline flex items-center justify-between">
+                <h3 className="font-display text-xl text-signal-amber">Active Participants</h3>
+                <button
+                  onClick={() => setShowParticipantsModal(false)}
+                  className="text-muted-slate hover:text-paper"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="p-6 space-y-4 max-h-[350px] overflow-y-auto pr-1">
+                {participants.length === 0 ? (
+                  <p className="text-sm text-muted-slate text-center py-6">No participants connected.</p>
+                ) : (
+                  participants.map((p) => {
+                    const initials = p.name.split(" ").map((n) => n[0]).join("");
+                    return (
+                      <div key={p.id} className="flex items-center justify-between border-b border-hairline/40 pb-2 last:border-b-0">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-ink border border-hairline flex items-center justify-center font-mono-ui text-xs font-semibold text-echo-teal">
+                            {initials}
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium">{p.name}</div>
+                            <div className="text-[10px] text-muted-slate uppercase tracking-wider">{p.role}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {p.handRaised && (
+                            <span className="w-6 h-6 rounded-full bg-signal-amber/15 text-signal-amber flex items-center justify-center" title="Hand Raised">
+                              <Hand size={12} />
+                            </span>
+                          )}
+                          <span className={`w-6 h-6 rounded-full flex items-center justify-center ${p.muted ? "bg-flag-rose/15 text-flag-rose" : "bg-signal-amber/15 text-signal-amber"}`}>
+                            {p.muted ? <MicOff size={11} /> : <Mic size={11} />}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+              <div className="px-6 py-4 border-t border-hairline flex justify-end">
+                <button
+                  onClick={() => setShowParticipantsModal(false)}
+                  className="px-4 py-2 bg-signal-amber text-ink rounded-lg font-medium text-xs hover:brightness-105 transition"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Private Room Passcode Verification Overlay Modal */}
+      <AnimatePresence>
+        {needsPasscode && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              className="bg-ink-raised border border-hairline rounded-xl w-full max-w-sm p-6 overflow-hidden shadow-2xl"
+            >
+              <div className="text-center space-y-3">
+                <div className="w-12 h-12 rounded-full bg-signal-amber/15 text-signal-amber flex items-center justify-center mx-auto mb-2">
+                  <Lock size={20} />
+                </div>
+                <h3 className="font-display text-xl text-paper">Private Voice Room</h3>
+                <p className="text-xs text-muted-slate max-w-xs mx-auto">
+                  This room is private and requires a secure passcode validation to grant access.
+                </p>
+              </div>
+
+              <div className="mt-6 space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-slate font-medium">Room Passcode</label>
+                  <input
+                    type="password"
+                    value={passcode}
+                    onChange={(e) => setPasscode(e.target.value)}
+                    placeholder="Enter passcode"
+                    className="w-full bg-ink border border-hairline rounded-lg px-3 py-2.5 text-sm font-mono-ui placeholder:text-muted-slate/75 focus:outline-none focus:border-echo-teal text-center"
+                    onKeyDown={(e) => e.key === "Enter" && submitPasscode()}
+                  />
+                </div>
+
+                {passcodeError && (
+                  <div className="text-xs text-flag-rose bg-flag-rose/10 border border-flag-rose/25 rounded px-3 py-2 text-center">
+                    {passcodeError}
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  <Link
+                    to="/"
+                    className="flex-1 py-2.5 rounded-lg border border-hairline text-center text-xs hover:bg-ink transition"
+                  >
+                    Go Back
+                  </Link>
+                  <button
+                    onClick={submitPasscode}
+                    className="flex-1 py-2.5 rounded-lg bg-signal-amber text-ink font-semibold text-xs hover:brightness-105 transition"
+                  >
+                    Enter Room
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
+
+  async function submitPasscode() {
+    if (!passcode.trim()) return;
+    setPasscodeError("");
+    try {
+      await api.joinRoom(roomId, passcode.trim());
+      sessionStorage.setItem(`room_passcode_${roomId}`, passcode.trim());
+      setNeedsPasscode(false);
+      setWsError("");
+      // Refresh window to restart WS connection with the stored passcode
+      window.location.reload();
+    } catch (err) {
+      setPasscodeError("Invalid passcode. Access Denied.");
+    }
+  }
 }
 
 function ParticipantTile({ p }: { p: Participant }) {

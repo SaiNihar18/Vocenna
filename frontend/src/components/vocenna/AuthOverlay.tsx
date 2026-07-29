@@ -16,8 +16,8 @@ import {
    Animated amber waveform — continuously flowing
    with a hover glow boost and subtle pulse
    ───────────────────────────────────────────── */
-const WAVE_PATH = "M0,40 C40,40 60,22 100,22 C140,22 160,58 200,58 C240,58 260,26 310,26 C360,26 380,52 420,52 C460,52 480,34 520,34";
-const WAVE_LEN = 1180; // approximate path length for dash animation
+const WAVE_PATH = "M0,40 C35,15 95,15 130,40 C165,65 225,65 260,40 C295,15 355,15 390,40 C425,65 485,65 520,40";
+const WAVE_LEN = 1200; // approximate path length for dash animation
 
 function AmberWave() {
   const [hovered, setHovered] = useState(false);
@@ -87,8 +87,8 @@ function AmberWave() {
             fill="#E8A33D"
             filter="url(#wave-glow-filter)"
             animate={{
-              cx: [0, 100, 200, 310, 420, 520],
-              cy: [40, 22, 58, 26, 52, 34],
+              cx: [0, 65, 130, 195, 260, 325, 390, 455, 520],
+              cy: [40, 21.25, 40, 58.75, 40, 21.25, 40, 58.75, 40],
             }}
             transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
           />
@@ -232,6 +232,7 @@ export function AuthOverlay({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isWakingUp, setIsWakingUp] = useState(true);
+  const [infoModal, setInfoModal] = useState<"terms" | "privacy" | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -484,12 +485,86 @@ export function AuthOverlay({
 
           <p className="mt-6 text-center text-xs text-muted-slate/50">
             By continuing you agree to our{" "}
-            <span className="text-muted-slate/70 underline cursor-pointer">Terms</span>{" "}
+            <span
+              onClick={() => setInfoModal("terms")}
+              className="text-muted-slate/70 underline cursor-pointer hover:text-signal-amber transition-colors"
+            >
+              Terms
+            </span>{" "}
             &amp;{" "}
-            <span className="text-muted-slate/70 underline cursor-pointer">Privacy Policy</span>.
+            <span
+              onClick={() => setInfoModal("privacy")}
+              className="text-muted-slate/70 underline cursor-pointer hover:text-signal-amber transition-colors"
+            >
+              Privacy Policy
+            </span>.
           </p>
         </motion.div>
       </div>
+
+      {/* Info Overlay Modal for Terms / Privacy */}
+      <AnimatePresence>
+        {infoModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setInfoModal(null)}
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 15 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-ink-raised border border-hairline rounded-xl w-full max-w-md p-6 overflow-hidden shadow-2xl"
+            >
+              <div className="flex items-center justify-between border-b border-hairline pb-3 mb-4">
+                <h3 className="font-display text-xl text-signal-amber">
+                  {infoModal === "terms" ? "Terms of Service" : "Privacy Policy"}
+                </h3>
+                <button
+                  onClick={() => setInfoModal(null)}
+                  className="text-muted-slate hover:text-paper text-sm font-semibold"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="text-sm text-paper/85 leading-relaxed max-h-[300px] overflow-y-auto pr-1 space-y-3 font-sans">
+                {infoModal === "terms" ? (
+                  <>
+                    <p>Welcome to Vocenna. By using our voice collaboration and intelligence services, you agree to the following terms:</p>
+                    <h4 className="font-bold text-xs uppercase tracking-wider text-echo-teal">1. Core Services</h4>
+                    <p>Vocenna provides real-time voice translation, speech transcription, sentiment diagnostics, and RAG meeting search tools.</p>
+                    <h4 className="font-bold text-xs uppercase tracking-wider text-echo-teal">2. Intellectual Property</h4>
+                    <p>You retain full ownership of all voice recordings, meeting summaries, and transcripts processed on our server.</p>
+                    <h4 className="font-bold text-xs uppercase tracking-wider text-echo-teal">3. User Responsibility</h4>
+                    <p>You are responsible for obtaining appropriate consent from meeting participants before starting audio capture.</p>
+                  </>
+                ) : (
+                  <>
+                    <p>Your privacy is central to Vocenna. Here is how we handle and protect your session assets:</p>
+                    <h4 className="font-bold text-xs uppercase tracking-wider text-echo-teal">1. Data Minimization</h4>
+                    <p>Voice streams are analyzed in real-time. Transcripts and summary notes are stored securely using Supabase DB pooling.</p>
+                    <h4 className="font-bold text-xs uppercase tracking-wider text-echo-teal">2. Encryption</h4>
+                    <p>All database queries and WebSocket channels use TLS/SSL encryption. Authentication relies on cryptographically signed JWT tokens.</p>
+                    <h4 className="font-bold text-xs uppercase tracking-wider text-echo-teal">3. Control</h4>
+                    <p>You can permanently delete voice recordings, meeting reports, or transcripts at any time via the Vocenna settings panel.</p>
+                  </>
+                )}
+              </div>
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() => setInfoModal(null)}
+                  className="px-4 py-2 bg-signal-amber text-ink rounded-lg font-medium text-xs hover:brightness-105 transition"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

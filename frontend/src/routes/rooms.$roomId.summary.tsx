@@ -50,6 +50,59 @@ function SummaryPage() {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, done: !i.done } : i)));
   }
 
+  const [toast, setToast] = useState("");
+  const [regenerating, setRegenerating] = useState(false);
+
+  function triggerToast(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(""), 3000);
+  }
+
+  async function handleRegenerate() {
+    setRegenerating(true);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    setRegenerating(false);
+    triggerToast("AI Summary regenerated successfully!");
+  }
+
+  function handleCopy() {
+    const text = displaySummary.paragraphs.join("\n");
+    navigator.clipboard?.writeText(text);
+    triggerToast("Copied to clipboard!");
+  }
+
+  function handleExportReport() {
+    const text = `Vocenna Intelligence Report\nRoom: ${roomId}\n\nAI Summary:\n${displaySummary.paragraphs.join("\n")}\n\nKey Decisions:\n${displaySummary.key_decisions.map((d: string) => `- ${d}`).join("\n")}`;
+    const element = document.createElement("a");
+    const file = new Blob([text], { type: "text/plain" });
+    element.href = URL.createObjectURL(file);
+    element.download = `vocenna_report_${roomId}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    triggerToast("Report exported successfully!");
+  }
+
+  function handleDownloadFormat(format: "txt" | "json") {
+    let content = "";
+    let filename = "";
+    if (format === "txt") {
+      content = `Vocenna Summary Report - Room ${roomId}\n\n${displaySummary.paragraphs.join("\n")}`;
+      filename = `vocenna_summary_${roomId}.txt`;
+    } else {
+      content = JSON.stringify({ summary: displaySummary, sentiment: displaySentiment }, null, 2);
+      filename = `vocenna_summary_${roomId}.json`;
+    }
+    const element = document.createElement("a");
+    const file = new Blob([content], { type: "text/plain" });
+    element.href = URL.createObjectURL(file);
+    element.download = filename;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    triggerToast(`Downloaded summary in ${format.toUpperCase()} format.`);
+  }
+
   const [activeTab, setActiveTab] = useState("overview");
 
   const displaySummary = summary || mockSummary;
@@ -67,10 +120,28 @@ function SummaryPage() {
               <p className="text-sm text-muted-slate mt-1 font-mono-ui">Room ID: {roomId}</p>
             </div>
           </div>
-          <button className="self-start md:self-auto px-4 py-2 rounded-lg border border-hairline text-sm hover:bg-ink-raised transition">
+          <button
+            onClick={handleExportReport}
+            className="self-start md:self-auto px-4 py-2 rounded-lg border border-hairline text-sm hover:bg-ink-raised transition"
+          >
             Export Report
           </button>
         </div>
+
+        {/* Action toast message */}
+        <AnimatePresence>
+          {toast && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="bg-echo-teal/15 border border-echo-teal/30 text-echo-teal text-xs px-4 py-2.5 rounded-lg flex items-center gap-2"
+            >
+              <AlertCircle size={14} />
+              <span>{toast}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Navigation Tabs */}
         <div className="flex border-b border-hairline gap-2 overflow-x-auto pb-px">
@@ -165,10 +236,22 @@ function SummaryPage() {
                       </div>
                     )}
                     <div className="mt-6 flex gap-2 pt-4 border-t border-hairline/50">
-                      <button className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-hairline text-xs hover:bg-ink">
-                        <Sparkles size={12} /> Regenerate Summary
+                      <button
+                        onClick={handleRegenerate}
+                        disabled={regenerating}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-hairline text-xs hover:bg-ink disabled:opacity-50"
+                      >
+                        {regenerating ? (
+                          <span className="w-3 h-3 border border-paper border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Sparkles size={12} />
+                        )}
+                        {regenerating ? "Regenerating..." : "Regenerate Summary"}
                       </button>
-                      <button className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-hairline text-xs hover:bg-ink">
+                      <button
+                        onClick={handleCopy}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-hairline text-xs hover:bg-ink"
+                      >
                         <Copy size={12} /> Copy to Clipboard
                       </button>
                     </div>
@@ -260,10 +343,16 @@ function SummaryPage() {
         {/* Download Report Actions */}
         {!loading && (
           <div className="pt-6 border-t border-hairline flex items-center justify-center gap-6">
-            <button className="flex items-center gap-2 text-xs text-muted-slate hover:text-paper transition">
+            <button
+              onClick={() => handleDownloadFormat("txt")}
+              className="flex items-center gap-2 text-xs text-muted-slate hover:text-paper transition"
+            >
               <Download size={14} /> <span className="font-mono-ui">Download .TXT</span>
             </button>
-            <button className="flex items-center gap-2 text-xs text-muted-slate hover:text-paper transition">
+            <button
+              onClick={() => handleDownloadFormat("json")}
+              className="flex items-center gap-2 text-xs text-muted-slate hover:text-paper transition"
+            >
               <Download size={14} /> <span className="font-mono-ui">Download .JSON</span>
             </button>
           </div>

@@ -35,7 +35,9 @@ export {
   AlertCircle,
   Calendar,
   Play,
+  Pause,
   Clock,
+  Volume2,
   Brain,
   FileText,
 } from "lucide-react";

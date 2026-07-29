@@ -24,7 +24,13 @@ export function CreateRoomModal({
 
   async function submit() {
     setBusy(true);
-    const r = await api.createRoom({ title: title || "Untitled", isPrivate, capacity });
+    const r = await api.createRoom({
+      title: title || "Untitled",
+      description,
+      isPrivate,
+      capacity,
+      passcode: isPrivate ? passcode : undefined,
+    });
     setBusy(false);
     setCreated(r);
     onCreated?.(r);
