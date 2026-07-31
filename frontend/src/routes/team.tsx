@@ -60,22 +60,6 @@ function TeamPage() {
             role: me.role || "Host",
             avatar: me.avatar,
             status: "Active"
-          },
-          {
-            id: "u_sarah",
-            name: "Sarah Jenkins",
-            email: "sarah.j@vocenna.io",
-            role: "Host",
-            avatar: undefined,
-            status: "Active"
-          },
-          {
-            id: "u_marcus",
-            name: "Marcus Vance",
-            email: "marcus.v@vocenna.io",
-            role: "Speaker",
-            avatar: undefined,
-            status: "Away"
           }
         ]);
       } catch (err) {

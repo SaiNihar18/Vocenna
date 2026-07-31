@@ -117,59 +117,31 @@ export const currentUser = {
   language: "en",
 };
 
-export const mockRooms: Room[] = [
-  {
-    id: "r_q3",
-    code: "VOC-9921-X",
-    title: "Q3 Strategy Alignment",
-    owner: "Sarah J.",
-    ownerAvatar: undefined,
-    isPrivate: true,
-    participants: 12,
-    capacity: 50,
-    durationSec: 45 * 60 + 21,
-    live: true,
-  },
-];
+export const mockRooms: Room[] = [];
 
 export const mockSummary = {
-  headline: "Project Alpha — Q3 Roadmap Realignment",
+  headline: "Voice Session Intelligence Report",
   paragraphs: [
-    "The product team convened to discuss the Q3 roadmap realignment, focusing specifically on integrating the new audio-processing engine. The consensus was that current latency issues are unacceptable for the professional tier user base, necessitating a shift in engineering resources.",
+    "No transcription segments recorded for this meeting. Please ensure participants speak in the room to index and construct AI summary reports."
   ],
-  takeaways: [
-    "Latency reduction is prioritized over new feature development for Q3.",
-  ],
-  topics: ["#AudioLatency", "#BetaFeedback"],
-  key_decisions: [
-    "Halt all development on the vocal tuning module until the core playback latency drops below 12ms.",
-  ],
-  action_items: [
-    { id: "a1", text: "Draft simplified export modal wireframes.", assignee: "Sarah J.", done: false },
-    { id: "a2", text: "Schedule backend architecture review.", assignee: "Mike T.", done: true },
-  ],
+  takeaways: [],
+  topics: [],
+  key_decisions: [],
+  action_items: [],
 };
 
 export const mockSentiment = {
-  constructive: 65,
-  neutral: 20,
-  tense: 15,
-  note: "Sentiment spiked in tension during the latency discussion, but resolved into constructive problem-solving.",
+  constructive: 0,
+  neutral: 0,
+  tense: 0,
+  note: "No active conversation audio tracked yet. Sentiment indicators are pending.",
 };
 
 export function mockMemoryResponse(q: string) {
   return {
     query: q,
-    answer: "Based on your meetings, you decided to use a Redis cache layer before Q4 to reduce latency.",
-    citations: [
-      {
-        id: "cite1",
-        quote: "I strongly believe we need a Redis cache layer for scaling.",
-        speaker: "Marcus V.",
-        location: "Q3 Planning, 14:22",
-        confidence: 3,
-      },
-    ],
+    answer: "No matching transcript segments could be synthesized from your past meetings. Ensure you record and save voice rooms first.",
+    citations: [],
   };
 }
 

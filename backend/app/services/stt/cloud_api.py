@@ -4,7 +4,7 @@ import os
 from typing import Dict, Any, Optional
 from app.services.stt.base import BaseSTTService
 from app.core.config import settings
-
+from app.services.stt.groq import get_audio_format_and_ext
 
 class CloudOpenAISTTService(BaseSTTService):
     """Cloud API STT driver using OpenAI Whisper endpoint."""
@@ -27,7 +27,8 @@ class CloudOpenAISTTService(BaseSTTService):
                 "segments": []
             }
 
-        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp:
+        mime_type, suffix = get_audio_format_and_ext(audio_bytes)
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
             tmp.write(audio_bytes)
             tmp_path = tmp.name
 
@@ -38,7 +39,8 @@ class CloudOpenAISTTService(BaseSTTService):
                     if language:
                         data["language"] = language
 
-                    files = {"file": ("audio.mp3", audio_file, "audio/mpeg")}
+                    filename = f"audio{suffix}"
+                    files = {"file": (filename, audio_file, mime_type)}
                     headers = {"Authorization": f"Bearer {self.api_key}"}
 
                     response = await client.post(

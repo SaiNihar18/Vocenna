@@ -13,35 +13,7 @@ export const Route = createFileRoute("/recordings")({
   component: RecordingsPage,
 });
 
-const initialRecordings = [
-  {
-    id: "rec_1",
-    title: "Q3 Strategy Alignment Meeting",
-    roomCode: "VOC-9921-X",
-    date: "2026-07-28",
-    duration: "45:21",
-    size: "41.5 MB",
-    transcript: "[Elena R. - 10:00 AM]: Welcome everyone to the Q3 Alignment session. Today we are prioritizing audio latency issues...\n[Marcus V. - 10:04 AM]: I strongly believe we need a Redis cache layer to solve the bottleneck.\n[Sarah J. - 10:15 AM]: Let's halt the vocal tuning module until core playback latency is under 12ms."
-  },
-  {
-    id: "rec_2",
-    title: "Cross-Border API Review",
-    roomCode: "VOC-3212-A",
-    date: "2026-07-24",
-    duration: "18:40",
-    size: "17.1 MB",
-    transcript: "[Host - 2:00 PM]: Let's walk through the cors updates for Vercel integration.\n[Marcus V. - 2:05 PM]: Make sure vocenna.vercel.app and vocenna-ecru are both in the origins array."
-  },
-  {
-    id: "rec_3",
-    title: "Weekly Engineering Sync",
-    roomCode: "VOC-4410-B",
-    date: "2026-07-20",
-    duration: "32:15",
-    size: "29.4 MB",
-    transcript: "[Host - 9:00 AM]: Good morning team. Today we are testing the new SQLAlchemy asyncpg driver scheme parser..."
-  }
-];
+const initialRecordings: any[] = [];
 
 function RecordingsPage() {
   const [recordings, setRecordings] = useState(initialRecordings);
